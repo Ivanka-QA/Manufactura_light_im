@@ -4,65 +4,61 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.*;
+import static io.testomat.manufactura_light_im.FiltersHelper.searchProject;
+import static io.testomat.manufactura_light_im.FiltersHelper.selectCompany;
+import static io.testomat.manufactura_light_im.HomePageHelper.tileTestsCounterShouldBeEqualTo;
+import static io.testomat.manufactura_light_im.NavigationHelper.navigateToHomePage;
+import static io.testomat.manufactura_light_im.NavigationHelper.openProject;
+import static io.testomat.manufactura_light_im.WaitForElementsHelper.waitForEmptyProjectIsLoaded;
+import static io.testomat.manufactura_light_im.WaitForElementsHelper.waitForProjectWithSuitesIsLoaded;
 
-public class ProjectPageTests {
+public class ProjectPageTests extends BaseTest{
+
+    String username = env.get("USERNAME");
+    String password = env.get("PASSWORD");
 
     @BeforeEach
-    public void login() {
-        open("https://app.testomat.io");
+    public void setup() {
+        navigateToHomePage();
 
-        //enter credentials and submit
-        $("#content-desktop #user_email").setValue("mailforivanna@gmail.com");
-        $("#content-desktop #user_password").setValue("75Qke9cBV@3nvCL");
-        $("#content-desktop #user_remember_me").click();
-        $("#content-desktop [name=\"commit\"]").click();
-        $(".common-flash-success").shouldBe(visible);
+        AuthHelper.login(username, password);
     }
 
     @Test
     public void userNavigateToEmptyProjectPage() {
-        //select company
-        $("#company_id").click();
-        $(byText("QA Club Lviv")).click();
+        String projectName = "Manufacture light";
 
-        //search project
-        $("#search").setValue("Manufacture light");
+        selectCompany("QA Club Lviv");
 
-        //select project
-        $(byText("Manufacture light")).click();
+        searchProject(projectName);
 
-        //project is loaded
-        $(".empty h2").shouldHave(text("\uD83E\uDE84 Let's do some testing!\n"));
+        tileTestsCounterShouldBeEqualTo(projectName, 0);
+
+        openProject(projectName);
+
+        waitForEmptyProjectIsLoaded();
 
     }
 
     @Test
     public void userNavigateToProjectWithSuitesPage() {
+        String projectName = "Manufacture Testomatio";
 
-        //select company
-        $("#company_id").click();
-        $(byText("QA Club Lviv")).click();
+        selectCompany("QA Club Lviv");
 
-        //search project
-        $("#search").setValue("Manufacture Testomatio");
+        searchProject(projectName);
 
-        //open project page
-        $(byText("Manufacture Testomatio")).click();
+        openProject(projectName);
 
-        //project page is loaded
-        $(".first h2").shouldHave(text("Manufacture Testomatio"));
-        $("[aria-label=\"Tabs\"]").shouldBe(visible);
-        $x("//*[@id=\"ember53\"]/* ").should(exist);
+        waitForProjectWithSuitesIsLoaded(projectName);
     }
 
+
+
     @AfterEach
-    public void logout() {
-        open("https://app.testomat.io");
-        $("#user-menu-button").click();
-        $("[type=\"submit\"]").shouldHave(text("Sign Out")).click();
+    public void cleanup() {
+        navigateToHomePage();
+        AuthHelper.logout();
     }
 
 }
