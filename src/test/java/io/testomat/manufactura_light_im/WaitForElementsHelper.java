@@ -12,6 +12,6 @@ public class WaitForElementsHelper {
     static void waitForProjectWithSuitesIsLoaded(String projectName) {
         $(".first h2").shouldHave(text(projectName));
         $("[aria-label=\"Tabs\"]").shouldBe(visible);
-        $x("//*[@id=\"ember53\"]/* ").should(exist);
+        $x("//*[contains(@class, \"dragSortList\")]/* ").should(exist);
     }
 }
