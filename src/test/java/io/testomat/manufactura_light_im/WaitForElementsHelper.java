@@ -6,7 +6,7 @@ import static com.codeborne.selenide.Selenide.$x;
 
 public class WaitForElementsHelper {
     static void waitForEmptyProjectIsLoaded() {
-        $(".empty h2").shouldHave(text("\uD83E\uDE84 Let's do some testing!\n"));
+        $(".empty h2").shouldHave(text("Let's do some testing!"));
     }
 
     static void waitForProjectWithSuitesIsLoaded(String projectName) {
