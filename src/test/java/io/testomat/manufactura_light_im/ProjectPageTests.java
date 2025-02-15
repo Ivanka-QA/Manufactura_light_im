@@ -1,64 +1,68 @@
 package io.testomat.manufactura_light_im;
 
-import org.junit.jupiter.api.AfterEach;
+import io.testomat.manufactura_light_im.web.ProjectPage;
+import io.testomat.manufactura_light_im.web.ProjectsPage;
+import io.testomat.manufactura_light_im.web.SignInPage;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static io.testomat.manufactura_light_im.FiltersHelper.searchProject;
-import static io.testomat.manufactura_light_im.FiltersHelper.selectCompany;
-import static io.testomat.manufactura_light_im.HomePageHelper.tileTestsCounterShouldBeEqualTo;
-import static io.testomat.manufactura_light_im.NavigationHelper.navigateToHomePage;
-import static io.testomat.manufactura_light_im.NavigationHelper.openProject;
-import static io.testomat.manufactura_light_im.WaitForElementsHelper.waitForEmptyProjectIsLoaded;
-import static io.testomat.manufactura_light_im.WaitForElementsHelper.waitForProjectWithSuitesIsLoaded;
+import static io.testomat.manufactura_light_im.utils.StringParsers.parseIntegerFromString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProjectPageTests extends BaseTest{
+public class ProjectPageTests extends BaseTest {
 
-    String username = env.get("USERNAME");
-    String password = env.get("PASSWORD");
+    private static final SignInPage signInPage = new SignInPage();
+    private static final ProjectsPage projectsPage = new ProjectsPage();
+    private static final ProjectPage projectPage = new ProjectPage();
+    static String username = env.get("USERNAME");
+    static String password = env.get("PASSWORD");
+
+    @BeforeAll
+    static void openSignInPageAndLogin() {
+        signInPage.open();
+        signInPage.login(username, password);
+
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        projectsPage.open();
+        AuthHelper.logout();
+    }
 
     @BeforeEach
-    public void setup() {
-        navigateToHomePage();
-
-        AuthHelper.login(username, password);
+    public void openProjectsPage() {
+        projectsPage.open();
     }
 
     @Test
-    public void userNavigateToEmptyProjectPage() {
+    public void userNavigatesToEmptyProjectPage() {
         String projectName = "Manufacture light";
+        Integer expectedTetsCounter = 0;
 
-        selectCompany("QA Club Lviv");
+        projectsPage.pageIsLoaded();
+        projectsPage.selectCompany("QA Club Lviv");
+        projectsPage.searchProject(projectName);
+        var textWithTestsCounter = projectsPage.getTestsTotalCountFromProjectTile(projectName);
+        Integer testsCounter = parseIntegerFromString(textWithTestsCounter);
+        assertEquals(expectedTetsCounter, testsCounter);
 
-        searchProject(projectName);
-
-        tileTestsCounterShouldBeEqualTo(projectName, 0);
-
-        openProject(projectName);
-
-        waitForEmptyProjectIsLoaded();
+        projectsPage.openProject(projectName);
+        projectPage.emptyProjectPageIsLoaded();
 
     }
 
     @Test
-    public void userNavigateToProjectWithSuitesPage() {
+    public void userNavigatesToProjectWithSuitesPage() {
         String projectName = "Manufacture Testomatio";
 
-        selectCompany("QA Club Lviv");
-
-        searchProject(projectName);
-
-        openProject(projectName);
-
-        waitForProjectWithSuitesIsLoaded(projectName);
-    }
-
-
-
-    @AfterEach
-    public void cleanup() {
-        navigateToHomePage();
-        AuthHelper.logout();
+        projectsPage.pageIsLoaded();
+        projectsPage.selectCompany("QA Club Lviv");
+        projectsPage.searchProject(projectName);
+        projectsPage.openProject(projectName);
+        projectPage.projectPageWithSuitesIsLoaded(projectName);
     }
 
 }
