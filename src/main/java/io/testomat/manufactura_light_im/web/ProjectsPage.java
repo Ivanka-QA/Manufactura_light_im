@@ -1,7 +1,6 @@
 package io.testomat.manufactura_light_im.web;
 
 import com.codeborne.selenide.Selenide;
-import org.jspecify.annotations.NonNull;
 
 import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.visible;

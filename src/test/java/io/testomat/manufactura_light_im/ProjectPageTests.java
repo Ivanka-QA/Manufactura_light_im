@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 import static io.testomat.manufactura_light_im.utils.StringParsers.parseIntegerFromString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProjectPageTests extends BaseTest{
+public class ProjectPageTests extends BaseTest {
 
-    static String username = env.get("USERNAME");
-    static String password = env.get("PASSWORD");
     private static final SignInPage signInPage = new SignInPage();
     private static final ProjectsPage projectsPage = new ProjectsPage();
     private static final ProjectPage projectPage = new ProjectPage();
+    static String username = env.get("USERNAME");
+    static String password = env.get("PASSWORD");
 
     @BeforeAll
     static void openSignInPageAndLogin() {
@@ -26,11 +26,16 @@ public class ProjectPageTests extends BaseTest{
 
     }
 
+    @AfterAll
+    public static void cleanup() {
+        projectsPage.open();
+        AuthHelper.logout();
+    }
+
     @BeforeEach
     public void openProjectsPage() {
         projectsPage.open();
     }
-
 
     @Test
     public void userNavigatesToEmptyProjectPage() {
@@ -58,14 +63,6 @@ public class ProjectPageTests extends BaseTest{
         projectsPage.searchProject(projectName);
         projectsPage.openProject(projectName);
         projectPage.projectPageWithSuitesIsLoaded(projectName);
-    }
-
-
-
-    @AfterAll
-    public static void cleanup() {
-        projectsPage.open();
-        AuthHelper.logout();
     }
 
 }
